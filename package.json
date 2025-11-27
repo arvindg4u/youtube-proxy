@@ -1,0 +1,10 @@
+{
+  "name": "youtube-proxy",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "express": "latest",
+    "cors": "latest",
+    "youtube-transcript": "latest"
+  }
+}
