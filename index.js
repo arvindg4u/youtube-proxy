@@ -18,11 +18,41 @@ const RAPIDAPI_KEYS = [
 let currentKeyIndex = 0;
 const LANGS = ["en", "en-US", "en-GB", "hi", "hi-IN", "auto"];
 
+// n8n webhook URL - Telegram updates yahan forward honge
+const N8N_WEBHOOK_URL = "https://arvindkumar888-n8n-automation.hf.space/webhook/neurolaunch-telegram";
+
 app.get("/", (req, res) => {
   res.send("YouTube Transcript Proxy + Telegram Proxy for n8n HF Spaces running!");
 });
 
-// Telegram Proxy Endpoint for n8n HF Spaces
+// 🆕 Telegram Webhook Receiver - Telegram se updates receive karke n8n ko forward karta hai
+app.post("/telegram/webhook", async (req, res) => {
+  try {
+    console.log("📩 Telegram update received:", JSON.stringify(req.body, null, 2));
+    
+    // Telegram ko turant 200 OK response bhejo (required for webhook)
+    res.status(200).json({ ok: true });
+    
+    // Background mein n8n ko forward karo
+    fetch(N8N_WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(req.body)
+    })
+    .then(response => {
+      console.log("✅ Forwarded to n8n, status:", response.status);
+    })
+    .catch(err => {
+      console.error("❌ Error forwarding to n8n:", err.message);
+    });
+    
+  } catch (err) {
+    console.error("❌ Webhook error:", err.message);
+    res.status(200).json({ ok: true }); // Telegram ko phir bhi 200 bhejo
+  }
+});
+
+// Telegram Proxy Endpoint for n8n HF Spaces (existing)
 app.post("/telegram/sendMessage", async (req, res) => {
   try {
     const { token, chat_id, text, parse_mode } = req.body;
