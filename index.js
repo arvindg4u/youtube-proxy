@@ -25,6 +25,38 @@ app.get("/", (req, res) => {
   res.send("YouTube Transcript Proxy + Telegram Proxy for n8n HF Spaces running!");
 });
 
+// 🆕 Simple Telegram Send API for n8n (YouTube Bot ke liye)
+app.post("/api/send", async (req, res) => {
+  try {
+    const { chat_id, text, parse_mode } = req.body;
+    
+    if (!chat_id || !text) {
+      return res.status(400).json({ 
+        ok: false, 
+        error: "Missing required fields: chat_id, text" 
+      });
+    }
+    
+    // Hardcoded bot token (YouTube Tracker Bot)
+    const BOT_TOKEN = "8504718930:AAEWyZTpSJbH7sAC10-6mLIkCq1blZoof-c";
+    
+    const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        chat_id, 
+        text, 
+        parse_mode: parse_mode || "Markdown" 
+      })
+    });
+    
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
 // 🆕 Telegram Webhook Receiver - Telegram se updates receive karke n8n ko forward karta hai
 app.post("/telegram/webhook", async (req, res) => {
   try {
