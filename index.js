@@ -25,22 +25,19 @@ app.get("/", (req, res) => {
   res.send("YouTube Transcript Proxy + Telegram Proxy for n8n HF Spaces running!");
 });
 
-// 🆕 Simple Telegram Send API for n8n (YouTube Bot ke liye)
+// 🆕 Simple Telegram Send API for n8n (token as parameter)
 app.post("/api/send", async (req, res) => {
   try {
-    const { chat_id, text, parse_mode } = req.body;
+    const { token, chat_id, text, parse_mode } = req.body;
     
-    if (!chat_id || !text) {
+    if (!token || !chat_id || !text) {
       return res.status(400).json({ 
         ok: false, 
-        error: "Missing required fields: chat_id, text" 
+        error: "Missing required fields: token, chat_id, text" 
       });
     }
     
-    // Hardcoded bot token (YouTube Tracker Bot)
-    const BOT_TOKEN = "8504718930:AAEWyZTpSJbH7sAC10-6mLIkCq1blZoof-c";
-    
-    const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+    const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
